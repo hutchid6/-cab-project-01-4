@@ -1,0 +1,255 @@
+
+<!-- Contributors: Bret Elphick, Dalton Hutchinson, Jimmy Fay
+#Project Name - CSC 315: Energy Demand Tool
+#Project Description - Tool extracts data from database, creates a table, creates charts, and creates cards for viewing stats
+#File Name - /templates/my-result.html
+#File Description - Results webpage: displays table, charts, and cards --->
+
+<html>
+    <head>
+        <title>Flask result table using nested for loops</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style> 
+
+            body{
+                background-color: #d7e8f7;
+            }
+            .page-color-theme{
+                background-color: #293F6F;
+                color: aliceblue;
+            }
+            .table-hover tbody tr:hover td{
+                background-color: #293F6F;
+                color: #8d99a5;
+            }
+            .card-subtitle{
+                color: #8d99a5;
+            }
+            .start-right{
+                animation-duration: .75s;
+                animation-name: slide-in-right;
+            }
+            .start-left{
+                animation-duration: .75s;
+                animation-name: slide-in-left;
+            }
+
+            @keyframes slide-in-left{
+                from{
+                    margin-left: 25%;
+                    width: 125%;
+                }
+                to{
+                    margin-left: 0%;
+                    width: 100%;
+                }
+            }
+            @keyframes slide-in-right{
+                from{
+                    margin-left: -25%;
+                    width: 75%;
+                }
+                to{
+                    margin-left: 0%;
+                    width: 100%;
+                }
+            }
+            
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <div style="text-align: center;">
+                <a href="/"><img src="/static/tcnj.png" style="width: 120px;"></a>
+            </div>
+            <div class="text-center">
+                <h3 style="color:#293F6F;">Results</h3>
+            </div>
+            <br>
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    <div class="table-responsive start-left">
+                        <table class="table table-bordered table-hover" style="width:600px">
+                            <thead class="page-color-theme">
+                                <tr>
+                                {%for head in heads%}
+                                    <th>{{head}}</th>
+                                {%endfor%}
+                                </tr>
+                            </thead>
+                            <tbody class="page-color-theme">
+                            <!-- nested for loops in jinja template -->
+                            {%for row in table%}
+                                <tr>
+                                {%for col in row%}
+                                    <td>{{col}}</td>
+                                {%endfor%}
+                                </tr>
+                            {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+            
+            <div class="row">
+                <div class="col">
+                    <div class="energy-chart-container" style="width:400px; height:300px;">
+                        <canvas id="energy-line-chart"></canvas>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="cost-chart-container" style="width:400px; height:300px;">
+                        <canvas id="cost-line-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <br><br>
+            
+            <div class="row row-cols-3"> 
+                <div id class="col d-flex justify-content-center">
+                    <div id="car1" class="card w-75 page-color-theme">
+                        <div class="card-body">
+                            <h5 class="card-title">Average Energy</h5>
+                            <h6 class="card-subtitle mb-2">{{metername}} | {{type}}</h6>
+                            <p class="card-text">The average amount of energy produced from {{startdate}} to {{enddate}} is <strong>{{avg_energy}} {{unit}}</strong></p>
+                        </div>
+                    </div>
+                </div>   
+                <div class="col d-flex justify-content-center">
+                    <div id= "car2" class="card w-75 page-color-theme">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Energy</h5>
+                            <h6 class="card-subtitle mb-2">{{metername}} | {{type}}</h6>
+                            <p class="card-text">The total amount of energy produced from {{startdate}} to {{enddate}} is <strong>{{sum_energy}} {{unit}}</strong></p>
+                        </div>
+                    </div>
+                </div>  
+                <div class="col d-flex justify-content-center">
+                    <div id="car3" class="card w-75 page-color-theme">
+                        <div class="card-body">
+                            <h5 class="card-title">Average CO2e</h5>
+                            <h6 class="card-subtitle mb-2">{{metername}} | {{type}}</h6>
+                            <p class="card-text">The average CO2e from {{startdate}} to {{enddate}} is <strong>{{co2e}} metric tons</strong></p>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+            <br>
+            <div class="row row-cols-2 d-flex">
+                <div class="col d-flex justify-content-center">
+                    <div id="car5" class="card w-50 page-color-theme">
+                        <div class="card-body">
+                            <h5 class="card-title">Average Cost</h5>
+                            <h6 class="card-subtitle mb-2">{{metername}} | {{type}}</h6>
+                            <p class="card-text">The average cost from {{startdate}} to {{enddate}} is <strong>${{avg_cost}}</strong></p>
+                        </div>
+                    </div>
+                </div> 
+                <div class="col d-flex justify-content-center">
+                    <div id="car4" class="card w-50 page-color-theme">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Cost</h5>
+                            <h6 class="card-subtitle mb-2">{{metername}} | {{type}}</h6>
+                            <p class="card-text">The total cost from {{startdate}} to {{enddate}} is <strong>${{sum_cost}}</strong></p>
+                        </div>
+                    </div>
+                </div>     
+            </div>
+            
+            
+            <br><br><br>
+
+        </div>
+
+    <script>
+        
+        const observer = new IntersectionObserver(entries =>{
+            entries.forEach(entry => {
+                if(entry.isIntersecting)
+                {
+                    entry.target.classList.add('start-right');
+                }
+            });
+        });
+        observer.observe(document.querySelector('#car1'));
+        observer.observe(document.querySelector('#car2'));
+        observer.observe(document.querySelector('#car3'));
+        observer.observe(document.querySelector('#car4'));
+        observer.observe(document.querySelector('#car5'));
+        
+        const energy = document.getElementById('energy-line-chart');
+        const cost = document.getElementById('cost-line-chart');
+        const energy_chart = new Chart(energy,{
+            type: 'line',
+            data: {
+                labels: {{labels|tojson}},
+                datasets: [{
+                    label:"Energy",
+                    data: {{energy_amounts|tojson}},
+                    fill:false,
+                    borderColor:"#0000FF",
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive:true,
+                maintainAspectRatio:false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins:{
+                    title:{
+                        display:true,
+                        text:"Energy Amounts",
+                        align:"center",
+                    },
+                    legend:{
+                        display:false
+                    }
+                }
+            }
+        });
+
+        const cost_chart = new Chart(cost,{
+            type: 'line',
+            data: {
+                labels: {{labels|tojson}},
+                datasets: [{
+                    label:"Cost",
+                    data: {{cost_amounts|tojson}},
+                    fill:false,
+                    borderColor:"#00FF00",
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive:true,
+                maintainAspectRatio:false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins:{
+                    title:{
+                        display:true,
+                        text:"Cost Amounts",
+                        align:"center",
+                    },
+                    legend:{
+                        display:false
+                    }
+                }
+            }
+        });
+
+    </script>
+    </body>
+</html>
